@@ -22,7 +22,7 @@
 			</h3>
 		</div>
 		<div>
-			<h3 style="margin-left: 501px">Address:
+			<h3 style="margin-left: 500px">Address:
 				<input style="font-size: 15px;height: 20px;width: 200px" type="text" value ="" name="getaddress"><br>
 			</h3>
 		</div>
@@ -47,7 +47,7 @@
 			</h3>
 		</div>
 
-		<div style="margin-left: 550px">
+		<div style="text-align: center;">
   			<input style="font-size: 30px; width: 80px;height: 40px" type="submit" name="addcustomer" value = "Add"></button>
   			<input style="font-size: 30px; width: 80px;height: 40px" type="submit" name="cancel" value ="Cancel"></button>
   		</div>
@@ -66,8 +66,11 @@ if(isset($_POST['addcustomer'])){
 
 	$sqlinsert = "INSERT INTO customer (Name,Address,Phone,Email,Username,Password,CreatedDate) VALUES ('".$name."','".$address."','".$phone."','".$email."','".$username."','".$password."',NOW())";
 	$dbconnect->query($sqlinsert);
-
 }
+if(isset($_POST['cancel'])){
+	header("Location: index.php");
+}
+
 ?>
 
 </body>
