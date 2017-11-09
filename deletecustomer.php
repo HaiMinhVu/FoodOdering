@@ -13,9 +13,17 @@
 <html>
 <body style="background-color: lightblue">
 
+<style>
+table {border-collapse: collapse; width: 100%;}
+table, th, td{border: 1px solid black; height: 25px; text-align: center;}
+table, p{font-size: 17px;}
+.column {float: left; width: 50%;}
+.row:after {content: ""; display: table; clear: both;}
+</style>
+
 <p>
 	<form action="" method="POST">
-		<input type="text" Placeholder="ID_NO"  name="cus_id"><br>
+		<input type="text" placeholder="ID_NO"  name="cus_id"><br>
 		<input type="submit" name="deletecus" value="Delete">
 		<input type="submit" name="cancel" value="Cancel">
 	</form>
