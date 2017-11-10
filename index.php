@@ -15,9 +15,6 @@
   <button style="text-align: center; font-size: 20px; width: 220px;height: 40px" type="button" onclick="location='addproduct.php'">Add Product</button>
   </div>
   <div style="text-align: center;padding-top: 20px">
-  <button style="text-align: center; font-size: 20px; width: 220px;height: 40px"  type="button">Add Order</button>
-  </div>
-  <div style="text-align: center;padding-top: 20px">
   <button style="text-align: center; font-size: 20px; width: 220px;height: 40px" type="button">Update Product Type</button>
   </div>
   <div style="text-align: center;padding-top: 20px">
