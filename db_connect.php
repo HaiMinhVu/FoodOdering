@@ -5,6 +5,9 @@
 	$dbname = "FoodOrdering";
 
 //create connection
-	$dbconnect = new mysqli($servername,$username,$password,$dbname) or die(mysql_error());
+	$dbconnect = mysqli_connect($servername,$username,$password,$dbname);
+	if(mysqli_connect_errno()){
+		echo "Failed to connect: ".mysqli_connect_errno();
+	}
 
 ?>

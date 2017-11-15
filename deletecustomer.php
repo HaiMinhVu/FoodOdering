@@ -1,11 +1,5 @@
 <?php
-	$servername = "localhost";
-	$username = "root";
-	$password = "";
-	$dbname = "FoodOrdering";
-
-//create connection
-	$dbconnect = new mysqli($servername,$username,$password,$dbname) or die(mysql_error());
+	include_once "db_connect.php"
 
 ?>
 
@@ -23,7 +17,8 @@ table, p{font-size: 17px;}
 
 <p>
 	<form action="" method="POST">
-		<input type="text" placeholder="ID_NO"  name="cus_id"><br>
+		Enter ID number to be deleted<br>
+		<input type="text" placeholder="ID#"  name="cus_id"><br>
 		<input type="submit" name="deletecus" value="Delete">
 		<input type="submit" name="cancel" value="Cancel">
 	</form>

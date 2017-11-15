@@ -1,11 +1,5 @@
 <?php
-	$servername = "localhost";
-	$username = "root";
-	$password = "";
-	$dbname = "FoodOrdering";
-
-//create connection
-	$dbconnect = new mysqli($servername,$username,$password,$dbname) or die(mysql_error());
+	include_once "db_connect.php"
 
 ?>
 
@@ -73,8 +67,19 @@ if(isset($_POST['addcustomer'])){
 	$username = $_POST['getusername'];
 	$password = $_POST['getpassword'];
 
+
+
 	$sqlinsert = "INSERT INTO customer (Name,Address,Phone,Email,Username,Password,CreatedDate) VALUES ('".$name."','".$address."','".$phone."','".$email."','".$username."','".$password."',NOW())";
-	$dbconnect->query($sqlinsert);
+
+	if($dbconnect->query($sqlinsert)){
+		echo "Add Successfully";
+	}
+	else{
+		echo "Cannot Add Customer<br>";
+		echo $dbconnect->error;
+	}
+
+	
 }
 if(isset($_POST['cancel'])){
     header("Location: index.php");

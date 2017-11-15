@@ -1,75 +1,124 @@
 <?php
-	$servername = "localhost";
-	$username = "root";
-	$password = "";
-	$dbname = "FoodOrdering";
-
-//create connection
-	$dbconnect = new mysqli($servername,$username,$password,$dbname) or die(mysql_error());
+  include_once "db_connect.php";
+  $selectedproduct;
+  $selectedtype;
+  $selectedquantity;
 
 ?>
+
 <!DOCTYPE html>
 <html>
+<style>
+table {border-collapse: collapse; width: 100%;}
+table, th, td{border: 1px solid black; height: 25px; text-align: center;}
+table, p{font-size: 17px;}
+.column {float: left; width: 50%;}
+.row:after {content: ""; display: table; clear: both;}
+select, p{font-size: 15px;}
+input, p{font-size: 15px;}
+</style>
+
 <body style="background-color: lightblue">
-
-
-<p>
-Select Product?
-<form action="" method="POST">
-  <select name="addProduct">
-    <option value="">Select...</option>
-
-    <optgroup label="Appetizer" name="appetizer">
-      <option name="eggdrop">Egg Drop Soup</option>
-      <option name="hotsoursoup">Hot & Sour Soup</option>
-      <option name="wontonsoup">Wonton Soup</option>
-    </optgroup>
-
-    <optgroup label="Salad" name="salad">
-      <option name="ranch">Ranch</option>
-      <option name="bluecheese">Bluecheese</option>
-      <option name="garlic">Garlic</option>    
-    </optgroup>
+<div style="text-align: center; font-size: 17px">
+  <p>
+    <form action="" method="POST">
+     	<td>Select Product</td>
+        <td><select name="protype", id="protype">
+          <option>Select ...</option>
+          	<?php
+             $respro = $dbconnect->query("SELECT DISTINCT Pro_Type FROM product");
+            while ($row = mysqli_fetch_array($respro)) {
+          	?>
+            <option value="<?php echo $row['Pro_Type']?>"><?php echo $row['Pro_Type'];?></option>
+          <?php
+            }
+          ?>
+        </select></td>
+        <input type="submit" value="Confirm Product" name="addorder"><br><br>
+    	<script type="text/javascript">
+    		document.getElementById('protype').value = "<?php echo $_POST['protype']?>";
+    	</script>
     
-    <optgroup label="Beverage" name="beverage">
-      <option name="pepsi">Pepsi</option>  
-      <option name="drpeper">Dr Peper</option> 
-      <option name="srpite">Sprite</option> 
-      <option name="coke">Coke</option>     
-    </optgroup>
-
-    <optgroup label="MainDish" name="maindish">
-      <option name="rice">Rice</option>  
-      <option name="noodle">noodle</option>    
-    </optgroup>
-
-    <optgroup label="Dessert" name="dessert">
-      <option name="vanilaIC">Vanila Icecream</option>   
-      <option name="chocolate">Chocolate Icecream</option>
-      <option name="matcha">Matcha Icecream</option>   
-    </optgroup>
-    
-  </select>
-  
-  <input type="text" name="quanlity" placeholder="Quanlity"><br>
-  <input type="submit" name="placeorder" value="Place Order">
-  <input type="submit" name="cancel" value="Cancel">
-
-
-</form>
 <?php
-  if(isset($_POST['placeorder'])){
-
-  }
-  if(isset($_POST['cancel'])){
-    header("Location: index.php");
-  }
-
-
+if (isset($_POST['addorder']) == "Confirm Product") {
+    	$selectedproduct = $_POST['protype'];
+    	
+	}
 ?>
+  	
+    	<td>Select Type</td>
+    	<td><select name="typeopt" id="typeopt">
+     	<option>Select ...</option>
+			<?php
+			$restype = $dbconnect->query("SELECT Type_Opt FROM $selectedproduct");
+		    while($row = mysqli_fetch_array($restype)){
+			?>
+			 <option value="<?php echo $row['Type_Opt']?>"><?php echo $row['Type_Opt']?></option>
+			<?php  
+			} 
+			?>
+    	</select></td>
+    <input type="submit" value="Confirm Type" name="addorder"><br><br>
+    <script type="text/javascript">
+    		document.getElementById('typeopt').value = "<?php echo $_POST['typeopt']?>";
+    </script>
+	
+<?php
+	
+	if (isset($_POST['addorder']) == "Confirm Type") {
+    	$selectedtype = $_POST['typeopt'];
+	}
+?>
+	<td>Quantity </td>
+    <input type="number" name="quantity"><br><br>
+    <input type="submit" value="Add to Cart" name="addorder"><br><br>
+
+  	</form>
+  </p>
+<?php	
+ 	
+ 	if(isset($_POST['addorder']) == "Add to Cart"){
+ 		$selectedquantity = $_POST['quantity'];
+ 		$price = $dbconnect->query("SELECT Price FROM product WHERE Pro_ID = (SELECT Pro_ID FROM $selectedproduct WHERE Type_Opt = '$selectedtype')");
+ 		if($price){
+ 			echo $price;
+ 		}
+ 		
+ 		
+ 		$dbconnect->query("INSERT INTO cart VALUES('$selectedproduct', '$selectedtype', $selectedquantity)");
+ 	}
+ 	
+ ?>
+</div>
+<div name="temp_order" class="column">
+
+	<h1>Your Cart</h1>
+	<table>
+		<tr>
+			<th>Product</th>
+			<th>Type</th>
+			<th>Quantity</th>
+			<th>Price</th>
+		</tr>
+<?php
+		$result = $dbconnect->query("SELECT * FROM cart");
+
+		while($row = $result->fetch_assoc()){
+			echo "<tr>";
+
+			$keys = array_keys($row);
+			foreach($keys as $key){
+				echo "<td>".$row[$key]."</td>";
+			}
+
+			echo "</tr>";
+		}
+?>
+	</table>
+</div>
 
 
-</p>
+
 </body>
-</html>
 
+</html>
