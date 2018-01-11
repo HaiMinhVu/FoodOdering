@@ -47,7 +47,7 @@ table, p{font-size: 17px;}
 			<th>Created_Date</th>
 		</tr>
 <?php
-		$result = $dbconnect->query("SELECT ID_No, Name, Username, Email, CreatedDate FROM customer");
+		$result = $dbconnect->query("SELECT ID_No, Name, Username, Email, Created_Date FROM customer");
 
 		while($row = $result->fetch_assoc()){
 			echo "<tr>";

@@ -23,10 +23,10 @@ input, p{font-size: 15px;}
         <td><select name="protype", id="protype">
           <option>Select ...</option>
           	<?php
-             $respro = $dbconnect->query("SELECT DISTINCT Pro_Type FROM product");
+             $respro = $dbconnect->query("SELECT DISTINCT Type FROM product");
             while ($row = mysqli_fetch_array($respro)) {
           	?>
-            <option value="<?php echo $row['Pro_Type']?>"><?php echo $row['Pro_Type'];?></option>
+            <option value="<?php echo $row['Type']?>"><?php echo $row['Type'];?></option>
           <?php
             }
           ?>
@@ -46,7 +46,7 @@ if (isset($_POST['addorder']) == "Confirm Product") {
     	<td><select name="typeopt" id="typeopt">
      	<option>Select ...</option>
 			<?php
-			$restype = $dbconnect->query("SELECT Description FROM product WHERE Pro_Type = '$selectedproduct'");
+			$restype = $dbconnect->query("SELECT Description FROM product WHERE Type = '$selectedproduct'");
 		    while($row = mysqli_fetch_array($restype)){
 			?>
 			 <option value="<?php echo $row['Description']?>"><?php echo $row['Description']?></option>
@@ -67,104 +67,118 @@ if (isset($_POST['addorder']) == "Confirm Product") {
   	</form>
   </p>
 <?php
-	if (isset($_POST['addorder']) == "Confirm Type") {
-    	$selectedtype = $_POST['typeopt'];
-    	$price;
-    	$priceQuery = $dbconnect->query("SELECT Price FROM product WHERE Pro_Type = '".$selectedproduct."' AND Description = '".$selectedtype."'");
- 		while ($row = $priceQuery->fetch_assoc()) {
- 			$price = (double)$row['Price'];
- 		}
-	}
- 	if(isset($_POST['addorder']) == "Add to Cart"){
- 		$selectedquantity = $_POST['quantity'];
 
- 		/*********** CHECK IF ENOUGH QUANTITY IN DATABASE
+    if (isset($_POST['addorder']) == "Confirm Type") {
+    $selectedtype = $_POST['typeopt'];
+    $price;
+    $priceQuery = $dbconnect->query("SELECT Price FROM product WHERE Type = '".$selectedproduct."' AND Description = '".$selectedtype."'");
+    while ($row = $priceQuery->fetch_assoc()) {
+    $price = (double)$row['Price'];
+    }
+    }
+    if(isset($_POST['addorder']) == "Add to Cart") {
+        $selectedquantity = $_POST['quantity'];
 
- 		$available = $dbconnect->query("SELECT Available_Qty FROM product WHERE Pro_Type = '$selectedproduct' AND Description = '$selectedtype'");
- 		$availablequantity = mysqli_fetch_array($available);
+        /*********** CHECK IF ENOUGH QUANTITY IN DATABASE
+         *
+         * $available = $dbconnect->query("SELECT Available_Qty FROM product WHERE Pro_Type = '$selectedproduct' AND Description = '$selectedtype'");
+         * $availablequantity = mysqli_fetch_array($available);
+         *
+         * if($availablequantity > $selectedquantity){
+         * $dbconnect->query("INSERT INTO cart VALUES('$selectedproduct', '$selectedtype', $selectedquantity, $selectedquantity*$price)");
+         * }
+         * else{
+         * echo "<script>alert('Not enough product');</script>";
+         * }****************/
+        $value = $dbconnect->query("SELECT Quantity FROM PRODUCT WHERE Description = '$selectedtype'");
+        $currentQuantity = $value->fetch_array();
+        $currentQuantity = $currentQuantity["Quantity"];
+        if ($currentQuantity >= $selectedquantity) {
 
- 		if($availablequantity > $selectedquantity){
- 			$dbconnect->query("INSERT INTO cart VALUES('$selectedproduct', '$selectedtype', $selectedquantity, $selectedquantity*$price)");
- 		}
- 		else{
- 			echo "<script>alert('Not enough product');</script>";
- 		}****************/
+            $dbconnect->query("INSERT INTO cart VALUES('$selectedproduct', '$selectedtype', $selectedquantity, $selectedquantity*$price)");
+        }else{
+            echo "Not Enough in stock, only $currentQuantity left.";
+        }
+    }
 
- 		$dbconnect->query("INSERT INTO cart VALUES('$selectedproduct', '$selectedtype', $selectedquantity, $selectedquantity*$price)");
- 	}
-
- ?>
+    ?>
 
 
 </div>
 <div name="temp_order" class="column">
-	<h1>Your Cart</h1>
-	<table>
-		<tr>
-			<th>Product</th>
-			<th>Type</th>
-			<th>Quantity</th>
-			<th>Price</th>
-		</tr>
-<?php
-		$result = $dbconnect->query("SELECT * FROM cart");
+    <h1>Your Cart</h1>
+    <table>
+        <tr>
+            <th>Product</th>
+            <th>Type</th>
+            <th>Quantity</th>
+            <th>Price</th>
+        </tr>
+        <?php
+        $result = $dbconnect->query("SELECT * FROM cart");
 
-		while($row = $result->fetch_assoc()){
-			echo "<tr>";
+        while($row = $result->fetch_assoc()){
+            echo "<tr>";
 
-			$keys = array_keys($row);
-			foreach($keys as $key){
-				echo "<td>".$row[$key]."</td>";
-			}
+            $keys = array_keys($row);
+            foreach($keys as $key){
+                echo "<td>".$row[$key]."</td>";
+            }
 
-			echo "</tr>";
-		}
-?>
-	</table>
-	Total: 
-		<?php
-			$total = $dbconnect->query("SELECT SUM(Price) as total FROM cart");
-			while ($row = $total->fetch_assoc()) {
-				echo $row['total'];
-				$finaltotal = $row['total'];
-			}
-		?>
-
-
-<p>
-	<form action="" method="POST">
-		<input type="submit" value="Place Order" name="placeorder">
-		<input type="submit" value="Cancel Order" name="cancel">
-		
-	</form>
+            echo "</tr>";
+        }
+        ?>
+    </table>
+    Total:
+    <?php
+    $total = $dbconnect->query("SELECT SUM(Price) as total FROM cart");
+    while ($row = $total->fetch_assoc()) {
+        echo $row['total'];
+        $finaltotal = $row['total'];
+    }
+    ?>
 
 
-</p>
+    <p>
+    <form action="" method="POST">
+        <input type="submit" value="Place Order" name="placeorder">
+        <input type="submit" value="Cancel Order" name="cancel">
+
+    </form>
+
+
+    </p>
 
 </div>
 <?php
-	$cusID = $_SESSION["cusID"];
-	if(isset($_POST['placeorder'])){
-		$dbconnect->query("INSERT INTO orders VALUES(null, $cusID, NOW(), $finaltotal, null)");
+$cusID = $_SESSION["cusID"];
+if(isset($_POST['placeorder'])){
 
-		/**********  insert into including table
-		$orderidquery = $dbconnect->query("SELECT MAX(Order_No) FROM orders");
-		$orderid = (int)mysqli_fetch_array($orderidquery);
-		$proANDquantityquery = $dbconnect->query("SELECT Pro_ID, Quantity FROM product p JOIN cart c WHERE p.Pro_Type = c.Type AND p.Description = c.TypeOpt");
-		while ($row = $proANDquantityquery->fetch_assoc()) {
-			$proid = $row['Pro_ID'];
-			$proQty = $row['Quantity'];
-			
-			$dbconnect->query("INSERT INTO including VALUES($orderid, $proid, $proQty)");
-		}
+    $dbconnect->query("INSERT INTO orders VALUES(null, $cusID, NOW(), $finaltotal, 0, null)");
+    //First subtact all quantities
+    $result = $dbconnect->query("SELECT * FROM cart");
+    //Fetch most recent order
+    $currentOrderNumber = $dbconnect->query("SELECT Order_ID FROM ORDERS WHERE Customer_ID = $cusID ORDER BY Date DESC LIMIT 1")->fetch_assoc()[Order_ID];
+    while($row = $result->fetch_assoc()){
+        $currentItem = $row['TypeOpt'];
+        $currentInfo = $dbconnect->query("SELECT * FROM Product WHERE Description = '$currentItem'")->fetch_array();
+        $currentQuantity = $currentInfo['Quantity'];
+        $itemQuantity = $row['Quantity'];
+        $currentProID = $currentInfo['Pro_ID'];
+        $newQuantity = $currentQuantity - $itemQuantity;
+        $dbconnect->query("UPDATE Product SET Quantity= '$newQuantity' WHERE Pro_ID= '$currentProID'");
+        $dbconnect->query("INSERT INTO ITEMS VALUES('$currentOrderNumber', 'NULL', '$currentProID', '$itemQuantity')");
 
-		**********/
-		$dbconnect->query("DELETE FROM cart");
-	}
-	if(isset($_POST['cancel'])){
-		$dbconnect->query("DELETE FROM cart");
-		header("location:index.php");
-	}
+
+    }
+
+    $dbconnect->query("DELETE FROM cart");
+    header("Location: orders.php");
+}
+if(isset($_POST['cancel'])){
+    $dbconnect->query("DELETE FROM cart");
+    header("location:index.php");
+}
 ?>
 
 

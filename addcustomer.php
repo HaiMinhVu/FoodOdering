@@ -69,7 +69,7 @@ if(isset($_POST['addcustomer'])){
 
 
 
-	$sqlinsert = "INSERT INTO customer (Name,Address,Phone,Email,Username,Password,CreatedDate) VALUES ('".$name."','".$address."','".$phone."','".$email."','".$username."','".$password."',NOW())";
+	$sqlinsert = "INSERT INTO customer (ID_No,Name,Address,Phone,Email,Username,Password, Created_Date) VALUES (NULL,'$name','$address','$phone','$email','$username','$password',CURRENT_TIMESTAMP);";
 
 	if($dbconnect->query($sqlinsert)){
 		echo "Add Successfully";
